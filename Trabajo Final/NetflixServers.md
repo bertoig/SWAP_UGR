@@ -23,15 +23,15 @@ Después de todos estos datos, nos hacemos una idea del tamaño y la potencia qu
 Para comenzar, trataré de explicar como funciona Netflix desde el lado tecnológico con un pequeño ejemplo que encontré en uno de los artículos que adjutno en la bibliografía.
 Supongamos que tu app de mapas de confianza accede a tu localización en cada instante y genera un archivo llamado localizaciones.txt con dichas actualizaciones. Luego, decides desarrollar una aplicación con uso de geolocalización que recoja las coordenadas de dicho fichero. Unos cuantos meses despues, los desarrolladores de la aplicación de mapas deciden que a partir de ese instante guardaran los datos en una base de datos interna de la empresa. Todo tu trabajo en tu aplicación se habrá ido a la basura gracias a una decisión de una empresa externa. Imagínemonos ahora que esta aplicación que hemos desarrollado sea Netflix y no una 'miniapp', no podemos hacernos la idea de la cantidad de pérdidas que generaría dicho cambio. Dicha arquitectura es conocida como arquitectura monolítica.
 
-![img](monolítica)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/monolitica.png)
 
 Netflix en cambio, hace unos diez años marcó el comienzo de una revolución reescribiendo aplicaciones con dicha arquitectura en arquitectura de microservicios. Esta arquitectura se puede explicar sencillamente, a partir de este momento, las aplicaciones no compartirán datos con otras de forma natural (como explicamos en el ejemplo de locallizaciones.txt) ahora, las aplicaciones intercambiarán datos entre ellas mediante una API (application programming interface). Así que, en el caso del cambio anterior, al estar programada nuestra 'app' mediante la API de nuestra aplicación de mapas, no tendremos que cambiar absolutamente nada.
 
-![img](microservicios)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/microservicios.png)
 
 Una vez explicado el uso de los microservicios cabe comentar que Netflix hace uso de más de 700 para controlar correctamente cada parte de la aplicación: un microservicio que guarda qué has visto, otro encargado del cobro mensual, otro encargado de enviarte el archivo de vídeo correcto para tu dispositivo... Tal es el uso de dichos microservicios en Netflix que crearon su propia herramienta para orquestar microservicios: Conductor y su propio centro de software libre debido a sus grandes aportaciones: Netflix OSS.
 
-![img](Conductor) ![img](Netflix OSS)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/conductor.png) ![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/oss.png)
 
 
 ## ¿Dónde encontramos todo esto?
@@ -39,7 +39,7 @@ Netflix nace en 1998 como servicio de alquiler de DVDs a través del servicio po
 
 En su comienzo, Netflix crea dos centros de datos, uno al lado del otro en los que no dejan de tener problemas hasta llegar a una  pérdida muy amplia de datos en sus bases de datos relacionales. Por lo tanto, como leemos en un comunicado de Yury Izrailevsky (uno de los encargados de la migración del sistema) en el Netflix Media Center en 2016, tras 7 años de trabajo, consiguieron migrar el sistema a Amazon Web Services, esto les aportó numerosas ventajas, entre otras el aumento de actividad en la empresa como vemos en el siguiente gráfico:
 
-![img](actividadnetflix)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/streaminghours.png)
 
 A contrinuación seleccioné unas palabras de Yury Izrailevsky en el comunicado en las cuales explica las principales ventajas y las metas que AWS ayudó a conseguir en Netflix:
 
@@ -60,15 +60,17 @@ Podemos dividir la escalabilidad de AWS en dos: EC2 y S3. EC2 es el centro de AW
 
 En cuanto al almacenamiento en BBDD, Netflix opta por DynamoDB (propio de Amazon) y Cassandra (clave-valor, de Apache y escrita en Java). Una vez más, Netflix nos explica como funcionan sus bases de datos en The Netflix Tech Blog. Adjunto a continuación el enlace de dicha explicación: https://medium.com/netflix-techblog/implementing-the-netflix-media-database-53b5a840b42a. Resumiendo, nos aportan la siguiente imagen de como almacenan datos:
 
-![img](DB)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/DB.png)
 
 y la siguiente imagen del sistema de almacenamiento NetflixMediaDB:
 
-![img](DBsys)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/DBsys.png)
+
+![gif](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/DBAccion.gif)
 
  así como una imagen explicativa acerca de la estrategia de escalado en sus bases de datos:
 
- ![img](scaling)
+ ![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/Scaling.png)
 
  Yo me centraré en algo mas general, no en algo tan específico de la organización de las bases de datos y sus estrategias, pero como mencioné antes, os dejo el enlace con toda la explicación por parte de los ingenieros de Netflix.
 
@@ -92,14 +94,18 @@ Tiempo después, en 2011 Netflix se dio cuenta de que, debido a su tamaño, nece
 
 Como cada red de distribución consta de servidores almacenando contenido y envíandolo, Netflix se encargó de fabricar sus propios sistemas de almacenamiento y servicio en cada nodo: Open Connect Appliances que normalmente están montados en armarios de servidores:
 
-![img](oca) ![img](ocaserver)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/oca.jpeg) ![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/ocaserver.jpg)
+
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/openconnectdaredevil.jpg)
 
 Existen diferentes tipos de OCAs según su propósito. Hay OCAs grandes que pueden almacenar todo el catálogo de Netflix y los hay más pequeños que solamente guardan una parte del catálogo de vídeo. Los OCAs más pequeños están llenos de vídeos todos los días, durante las horas de menos actividad, utilizando un proceso al que Netflix llama caché proactiva. Desde el punto de vista del software, los OCAs usan el sistema operativo FreeBSD y NGINX para el servidor web. Así es, cada OCA tiene un servidor web y el vídeo se transmite en streaming usando NGINX. Para logar la mejor experiencia de vídeo posible, tendrían que tener una caché de vídeo en tu casa, algo que no es posible. Pero lo que sí que pueden hacer es poner un mini-Netflix tan cerca de tu casa como puedan.
+
+
 
 ### Localización de los OCAs
 Netflix distribuye sus servidores por mas de 1.000 localizaciones por todo el mundo. En el siguiente mapa se muestran dichas localizaciones:
 
-![img](mapalocalizaciones)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/mapalocalizaciones.jpg)
 
 Otros servicios de vídeo, como YouTube o Amazon, transmiten vídeo a través de su propia red. Estas compañías han creado, literalmente, una red global para distribuir contenidos a sus usuarios, pero debido a su complejidad y coste, Netflix adoptó un enfoque completamente distinto cuando creó su red de distribución de contenidos. Netflix no explota su propia red y ha dejado de explotar sus propios centros de datos. En su lugar, los proveedores de servicios de Internet (ISPs) aceptan poner los OCAs en sus centros de datos. Los OCAs se dan de forma gratuíta a los ISPs para que los pongan en sus redes y Netflix también pone OCAs cerca de puntos de intercambio de Internet (IXPs).
 
@@ -109,7 +115,7 @@ Netflix conoce en cada sitio del mundo con un alto nivel de precisión lo que va
 
 Utilizan los datos de popularidad para predecir qué vídeos van a ser probablemente vistos mañana en cada localización. En este caso, localización significa un conglomerado de OCAs situados dentro de un ISP o de un IXP. Copian los vídeos pronosticados a uno o más OCAs en cada localización, algo que se conoce como preposicionamiento. Los vídeos se ponen en los OCAs antes de que nadie los pida. Esto proporciona un gran servicio para los usuarios porque el vídeo que quieren ver ya está cerca, preparado y disponible para streaming. Netflix explota lo que se conoce como un sistema de caché escalonada.
 
-![img](cacheEscalonada)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/cacheEscalonada.jpg)
 
 Los OCAs más pequeños de los que hablábamos antes están en los ISPs y IXPs y son demasiado pequeños como para contener todo el catálogo de Netflix. Sin embargo, hay otras localizaciones que sí que tienen grandes OCAs con todo el catálogo y obtienen sus vídeos desde S3.
 
@@ -126,15 +132,15 @@ Para entender los dos primeros proyectos de Netflix, primero explicaré en que c
 
 El punto de partida del proyecto Isthmus de Netflix fue la necesidad de ofrecer streaming de calidad y sin caídas ni siquiera aumentos notables del tiempo de servicio incluso si los ELBs se caían. Decidieron pribar si conseguían mantener la latencia enviando de forma 'duplicada' los datos, mediante el ELB de AWS y mediante lo que ellos llamarron itsmos que conectaban entre si, diferentes zonas de una región de AWS mediante DNS y, en caso de fallar, tomar el mando como vía principal de transmisión de datos. En las primeras pruebas era un ingeniero, a mano, quien ejecutaba dicho cambio. Más adelante nace de su mano: Denominator, una biblioteca de código abierto para trabajar con proveedores DNS. Finalmente nació Zuul una capa de enrutamiento desarrollada por ellos mismos que mantiene el flujo de conexiones, permite un filtrado inteligente...
 
-![img](ok)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/isthmusok.png)
 
-![img](fail)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/isthmusfail.png)
 
 A continuación surge el proyecto Active-Active, que buscaba conectividad sin caídas ahora entre regiones. Hablando específicamente sobre el tema podríamos pasar horas, pero resumidamente es eso lo que buscaba, unir sus regiones por otras vías para aportar redundancia entre conexiones.
 
-![img](ok)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/activeactiveok.png)
 
-![img](fail)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/activeactiefail.png)
 
 ## Finalmente, ¿qué sucede cuando le damos al play?
 - Podemos dividir Netflix en tres partes: servidor, cliente y red de distribución.
@@ -143,7 +149,7 @@ A continuación surge el proyecto Active-Active, que buscaba conectividad sin ca
 - Existen cientos de ficheros diferentes para un mismo vídeo.
 - Todos los días, a través de Open Connect, distribuye vídeos en todo el mundo, según sus pronósticos sobre lo que van a querer ver los miembros de cada zona.
 
-![img](netflixfinal)
+![img](https://github.com/bertoig/SWAP_UGR/blob/master/Trabajo%20Final/Images/Netflixfinal.jpg)
 
 1. Seleccionas un vídeo que quieres ver usando un cliente que se ejecuta en algún dispositivo. El cliente envía una solicitud de reproducción (play) que indica qué vídeo deseas reproducir al servicio de aplicaciones de reproducción de Netflix que se ejecuta en AWS.
 
